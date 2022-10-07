@@ -27,7 +27,7 @@ namespace FeedbackApi.Controllers
 
             if (suggestion == null) return NotFound("Suggestion ID does not exist.");
 
-            var comments = await _context.Comments.Where(c => c.SuggestionId == suggestionId).OrderBy(c => c.CreatedAt).ToListAsync();
+            var comments = await _context.Comments.Where(c => c.SuggestionId == suggestionId).Include(c => c.Replies).OrderBy(c => c.CreatedAt).ToListAsync();
             return Ok(comments);
         }
 
@@ -50,6 +50,28 @@ namespace FeedbackApi.Controllers
 
             await _context.Comments.AddAsync(newComment);
             return CreatedAtRoute("GetComments", newComment);
+        }
+
+        [HttpPost]
+        [Route("{suggestionId}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PostReply(int suggestionId, CommentReply reply)
+        {
+            var suggestion = await _context.Suggestions.FindAsync(suggestionId);
+            var comment = await _context.Comments.FindAsync(reply.CommentId);
+
+            if (suggestion == null || comment == null) return NotFound("Suggestion or Comment ID does not exist.");
+
+            var newReply = new CommentReply
+            {
+                CommentId = reply.CommentId,
+                Content = reply.Content,
+                User = reply.User
+            };
+
+            await _context.CommentReplies.AddAsync(newReply);
+            return CreatedAtRoute("GetComments", newReply);
         }
     }
 }
