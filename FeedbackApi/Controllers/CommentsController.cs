@@ -53,13 +53,16 @@ namespace FeedbackApi.Controllers
         }
 
         [HttpPost]
-        [Route("{suggestionId}")]
+        [Route("{suggestionId}/{commentId}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PostReply(int suggestionId, CommentReply reply)
+        public async Task<IActionResult> PostReply(int suggestionId, int commentId, CommentReply reply)
         {
+            if (commentId != reply.CommentId) return BadRequest("Comment IDs do not match.");
+
             var suggestion = await _context.Suggestions.FindAsync(suggestionId);
-            var comment = await _context.Comments.FindAsync(reply.CommentId);
+            var comment = await _context.Comments.FindAsync(commentId);
 
             if (suggestion == null || comment == null) return NotFound("Suggestion or Comment ID does not exist.");
 

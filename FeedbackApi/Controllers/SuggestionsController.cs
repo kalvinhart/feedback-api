@@ -1,4 +1,6 @@
-﻿using FeedbackApi.Data;
+﻿using AutoMapper;
+using FeedbackApi.Data;
+using FeedbackApi.DTOs.Suggestion;
 using FeedbackApi.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +12,12 @@ namespace FeedbackApi.Controllers
     public class SuggestionsController : ControllerBase
     {
         private readonly FeedbackContext _context;
+        private readonly IMapper _mapper;
 
-        public SuggestionsController(FeedbackContext context)
+        public SuggestionsController(FeedbackContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -44,17 +48,11 @@ namespace FeedbackApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create(Suggestion suggestion)
+        public async Task<IActionResult> Create(CreateSuggestionDto suggestionDto)
         {
-            if (suggestion == null) return BadRequest("No data was received");
+            if (suggestionDto == null) return BadRequest("No data was received");
 
-            Suggestion newSuggestion = new Suggestion
-            {
-                Category = suggestion.Category,
-                Title = suggestion.Title,
-                Description = suggestion.Description,
-                UserId = suggestion.UserId,
-            };
+            var newSuggestion = _mapper.Map<Suggestion>(suggestionDto);
 
             var createdSuggestion = await _context.Suggestions.AddAsync(newSuggestion);
 
