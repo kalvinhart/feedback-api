@@ -9,7 +9,7 @@ namespace FeedbackApi.DTOs.Comment
         public string Content { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public List<CommentReply> Replies { get; set; } = new List<CommentReply>();
-        public UserDto User { get; set; } = null!;
+        public UserDetailDto User { get; set; } = null!;
         public int SuggestionId { get; set; }
     }
 }
