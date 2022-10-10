@@ -12,7 +12,5 @@ namespace FeedbackApi.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Suggestion> Suggestions { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
-        public DbSet<CommentReply> CommentReplies { get; set; } = null!;
-
     }
 }

@@ -15,7 +15,7 @@ namespace FeedbackApi.RequestHelpers
             CreateMap<CreateSuggestionDto, Suggestion>().ReverseMap();
             CreateMap<GetCommentDto, Comment>().ReverseMap();
             CreateMap<PostCommentDto, Comment>();
-            CreateMap<PostReplyDto, CommentReply>();
+            CreateMap<PostReplyDto, Comment>();
         }
     }
 }

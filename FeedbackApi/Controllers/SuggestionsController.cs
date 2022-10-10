@@ -36,8 +36,8 @@ namespace FeedbackApi.Controllers
         public async Task<IActionResult> Get(int id)
         {
             var suggestion = await _context.Suggestions
-                .Include(s => s.Comments)
-                .ThenInclude(c => c.Replies)
+                //.Include(s => s.Comments)
+                //.ThenInclude(c => c.Replies)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (suggestion == null) return NotFound("Suggestion ID does not exist.");
@@ -54,9 +54,11 @@ namespace FeedbackApi.Controllers
 
             var newSuggestion = _mapper.Map<Suggestion>(suggestionDto);
 
-            var createdSuggestion = await _context.Suggestions.AddAsync(newSuggestion);
+            Console.WriteLine(newSuggestion);
 
-            return CreatedAtRoute("GetSuggestions", createdSuggestion);
+            var createdSuggestion = await _context.Suggestions.AddAsync(newSuggestion);
+            await _context.SaveChangesAsync();
+            return CreatedAtRoute("GetSuggestions", newSuggestion);
         }
     }
 }
