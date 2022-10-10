@@ -35,10 +35,7 @@ namespace FeedbackApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
-            var suggestion = await _context.Suggestions
-                //.Include(s => s.Comments)
-                //.ThenInclude(c => c.Replies)
-                .FirstOrDefaultAsync(s => s.Id == id);
+            var suggestion = await _context.Suggestions.FirstOrDefaultAsync(s => s.Id == id);
 
             if (suggestion == null) return NotFound("Suggestion ID does not exist.");
 
@@ -54,11 +51,27 @@ namespace FeedbackApi.Controllers
 
             var newSuggestion = _mapper.Map<Suggestion>(suggestionDto);
 
-            Console.WriteLine(newSuggestion);
-
             var createdSuggestion = await _context.Suggestions.AddAsync(newSuggestion);
             await _context.SaveChangesAsync();
             return CreatedAtRoute("GetSuggestions", newSuggestion);
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Edit(EditSuggestionDto suggestionDto)
+        {
+            if (suggestionDto == null) return BadRequest("No data was received");
+
+            var suggestion = await _context.Suggestions.FirstOrDefaultAsync(s => s.Id == suggestionDto.Id);
+            if (suggestion == null) return NotFound("Suggestion ID does not exist.");
+
+            var newSuggestion = _mapper.Map(suggestionDto, suggestion);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
