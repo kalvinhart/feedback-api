@@ -13,7 +13,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<FeedbackContext>(opt =>
 {
-    opt.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
 
 var app = builder.Build();
