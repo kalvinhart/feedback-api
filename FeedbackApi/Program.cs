@@ -17,7 +17,12 @@ builder.Services.AddDbContext<FeedbackContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
-builder.Services.AddIdentityCore<User>()
+// Add Identity authentication service
+builder.Services.AddIdentityCore<User>(opt =>
+{
+    opt.Password.RequireNonAlphanumeric = false;
+    opt.User.RequireUniqueEmail = true;
+})
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<FeedbackContext>();
 builder.Services.AddAuthentication();

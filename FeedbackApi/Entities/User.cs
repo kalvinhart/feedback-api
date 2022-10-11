@@ -11,7 +11,7 @@ namespace FeedbackApi.Entities
 
     public enum Role
     {
+        User,
         Admin,
-        User
     }
 }
