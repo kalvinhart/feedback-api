@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FeedbackApi.DTOs.User;
 using FeedbackApi.Entities;
+using FeedbackApi.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +13,13 @@ namespace FeedbackApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly TokenService _tokenService;
 
-        public UsersController(UserManager<User> userManager, IMapper mapper)
+        public UsersController(UserManager<User> userManager, IMapper mapper, TokenService tokenService)
         {
             _userManager = userManager;
             _mapper = mapper;
+            _tokenService = tokenService;
         }
 
         [HttpPost]
@@ -28,6 +31,8 @@ namespace FeedbackApi.Controllers
                 return Unauthorized();
 
             var mappedUser = _mapper.Map<UserDto>(user);
+
+            mappedUser.Token = await _tokenService.GenerateToken(user);
 
             return Ok(mappedUser);
         }

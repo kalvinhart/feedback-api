@@ -33,6 +33,7 @@ namespace FeedbackApi.Services
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
+            Console.WriteLine(key);
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
             var tokenOptions = new JwtSecurityToken(
