@@ -10,13 +10,12 @@ namespace FeedbackApi.RequestHelpers
     {
         public MappingProfiles()
         {
-            CreateMap<UserDto, User>().ReverseMap();
+            CreateMap<User, UserDto>();
             CreateMap<UserDetailDto, User>().ReverseMap();
             CreateMap<CreateSuggestionDto, Suggestion>().ReverseMap();
             CreateMap<EditSuggestionDto, Suggestion>().ReverseMap();
             CreateMap<GetCommentDto, Comment>().ReverseMap();
             CreateMap<PostCommentDto, Comment>();
-            CreateMap<PostReplyDto, Comment>();
         }
     }
 }

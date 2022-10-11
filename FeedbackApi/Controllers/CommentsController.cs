@@ -1,4 +1,6 @@
-﻿using FeedbackApi.Data;
+﻿using AutoMapper;
+using FeedbackApi.Data;
+using FeedbackApi.DTOs.Comment;
 using FeedbackApi.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,72 +13,50 @@ namespace FeedbackApi.Controllers
     public class CommentsController : ControllerBase
     {
         private readonly FeedbackContext _context;
+        private readonly IMapper _mapper;
 
-        public CommentsController(FeedbackContext context)
+        public CommentsController(FeedbackContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        [HttpGet]
-        [Route("{suggestionId}", Name = "GetComments")]
+        [HttpGet("{id}", Name = "GetComments")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetComments(int suggestionId)
+        public async Task<IActionResult> GetComments(int id)
         {
-            var suggestion = await _context.Suggestions.FindAsync(suggestionId);
+            var suggestion = await _context.Suggestions.FindAsync(id);
 
             if (suggestion == null) return NotFound("Suggestion ID does not exist.");
 
-            var comments = await _context.Comments.Where(c => c.SuggestionId == suggestionId).OrderBy(c => c.CreatedAt).ToListAsync();
-            return Ok(comments);
+            var comments = await _context.Comments.Where(c => c.SuggestionId == id).OrderBy(c => c.CreatedAt).ToListAsync();
+
+            var commentsResponse = new List<GetCommentDto>();
+
+            foreach (var comment in comments)
+            {
+                commentsResponse.Add(_mapper.Map<GetCommentDto>(comment));
+            }
+
+            return Ok(commentsResponse);
         }
 
         [HttpPost]
-        [Route("{suggestionId}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PostComment(int suggestionId, Comment comment)
+        public async Task<IActionResult> PostComment(PostCommentDto commentDto)
         {
-            var suggestion = await _context.Suggestions.FindAsync(suggestionId);
+            var suggestion = await _context.Suggestions.FirstOrDefaultAsync(c => c.Id == commentDto.SuggestionId);
 
             if (suggestion == null) return NotFound("Suggestion ID does not exist.");
 
-            var newComment = new Comment
-            {
-                SuggestionId = suggestionId,
-                Content = comment.Content,
-                Username = comment.Username,
-                AuthorName = comment.AuthorName
-            };
+            var newComment = _mapper.Map<Comment>(commentDto);
 
             await _context.Comments.AddAsync(newComment);
-            return CreatedAtRoute("GetComments", newComment);
-        }
+            await _context.SaveChangesAsync();
 
-        [HttpPost]
-        [Route("{suggestionId}/{commentId}")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PostReply(int suggestionId, int commentId, Comment reply)
-        {
-            if (commentId != reply.ParentCommentId) return BadRequest("Comment IDs do not match.");
-
-            var suggestion = await _context.Suggestions.FindAsync(suggestionId);
-            var comment = await _context.Comments.FindAsync(commentId);
-
-            if (suggestion == null || comment == null) return NotFound("Suggestion or Comment ID does not exist.");
-
-            var newReply = new Comment
-            {
-                ParentCommentId = reply.ParentCommentId,
-                Content = reply.Content,
-                Username = reply.Username,
-                AuthorName = reply.AuthorName,
-            };
-
-            await _context.Comments.AddAsync(newReply);
-            return CreatedAtRoute("GetComments", newReply);
+            return CreatedAtAction(nameof(GetComments), new { id = commentDto.SuggestionId }, commentDto);
         }
     }
 }
