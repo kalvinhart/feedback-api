@@ -1,5 +1,7 @@
 using FeedbackApi.Data;
+using FeedbackApi.Entities;
 using FeedbackApi.RequestHelpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,11 @@ builder.Services.AddDbContext<FeedbackContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
+builder.Services.AddIdentityCore<User>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<FeedbackContext>();
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
