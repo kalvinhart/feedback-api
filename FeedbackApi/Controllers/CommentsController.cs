@@ -2,12 +2,13 @@
 using FeedbackApi.Data;
 using FeedbackApi.DTOs.Comment;
 using FeedbackApi.Entities;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FeedbackApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CommentsController : ControllerBase
@@ -32,11 +33,11 @@ namespace FeedbackApi.Controllers
 
             var comments = await _context.Comments.Where(c => c.SuggestionId == id).OrderBy(c => c.CreatedAt).ToListAsync();
 
-            var commentsResponse = new List<GetCommentDto>();
+            var commentsResponse = new List<CommentDto>();
 
             foreach (var comment in comments)
             {
-                commentsResponse.Add(_mapper.Map<GetCommentDto>(comment));
+                commentsResponse.Add(_mapper.Map<CommentDto>(comment));
             }
 
             return Ok(commentsResponse);

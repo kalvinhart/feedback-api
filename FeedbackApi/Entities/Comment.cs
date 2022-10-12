@@ -8,6 +8,7 @@
         public string AuthorName { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int SuggestionId { get; set; }
+        public Suggestion Suggestion { get; set; } = null!;
         public int? ParentCommentId { get; set; }
     }
 }

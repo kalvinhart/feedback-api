@@ -1,11 +1,10 @@
 ﻿using FeedbackApi.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FeedbackApi.Data
 {
-    public class FeedbackContext : IdentityDbContext<User>
+    public class FeedbackContext : IdentityDbContext<User, UserRole, int>
     {
         public FeedbackContext(DbContextOptions options) : base(options)
         {
@@ -18,10 +17,10 @@ namespace FeedbackApi.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<IdentityRole>()
+            builder.Entity<UserRole>()
                 .HasData(
-                    new IdentityRole { Name = "User", NormalizedName = "USER" },
-                    new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" }
+                    new UserRole { Id = 1, Name = "User", NormalizedName = "USER" },
+                    new UserRole { Id = 2, Name = "Admin", NormalizedName = "ADMIN" }
                 );
         }
     }
