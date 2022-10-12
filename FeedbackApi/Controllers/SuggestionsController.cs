@@ -2,11 +2,13 @@
 using FeedbackApi.Data;
 using FeedbackApi.DTOs.Suggestion;
 using FeedbackApi.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FeedbackApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SuggestionsController : ControllerBase
