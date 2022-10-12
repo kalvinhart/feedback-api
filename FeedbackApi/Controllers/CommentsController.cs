@@ -33,11 +33,11 @@ namespace FeedbackApi.Controllers
 
             var comments = await _context.Comments.Where(c => c.SuggestionId == id).OrderBy(c => c.CreatedAt).ToListAsync();
 
-            var commentsResponse = new List<GetCommentDto>();
+            var commentsResponse = new List<CommentDto>();
 
             foreach (var comment in comments)
             {
-                commentsResponse.Add(_mapper.Map<GetCommentDto>(comment));
+                commentsResponse.Add(_mapper.Map<CommentDto>(comment));
             }
 
             return Ok(commentsResponse);

@@ -9,6 +9,7 @@
         public Status Status { get; set; } = Status.Untracked;
         public int Upvotes { get; set; }
         public int UserId { get; set; }
+        public List<Comment> Comments { get; set; } = new List<Comment>();
     }
 
     public enum Category

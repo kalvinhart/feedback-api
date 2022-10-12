@@ -37,11 +37,11 @@ namespace FeedbackApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
-            var suggestion = await _context.Suggestions.FirstOrDefaultAsync(s => s.Id == id);
+            var suggestion = await _context.Suggestions.Include(s => s.Comments).FirstOrDefaultAsync(s => s.Id == id);
 
             if (suggestion == null) return NotFound("Suggestion ID does not exist.");
 
-            return Ok(suggestion);
+            return Ok(_mapper.Map<SuggestionDto>(suggestion));
         }
 
         [HttpPost]

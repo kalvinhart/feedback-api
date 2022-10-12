@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FeedbackApi.Migrations
 {
     [DbContext(typeof(FeedbackContext))]
-    [Migration("20221012152305_Initial")]
+    [Migration("20221012155434_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,8 @@ namespace FeedbackApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SuggestionId");
 
                     b.ToTable("Comments");
                 });
@@ -143,9 +145,6 @@ namespace FeedbackApi.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -202,14 +201,14 @@ namespace FeedbackApi.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "8b7cd118-9f6b-4335-bc39-1f570ce4d27d",
+                            ConcurrencyStamp = "63e9f82e-509f-405a-98ed-764304dba85c",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "e0a08d1f-758e-4cab-aec6-e7bb82c756fd",
+                            ConcurrencyStamp = "42cc4b1b-6249-4c63-8b4a-75027883f3e1",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -318,6 +317,17 @@ namespace FeedbackApi.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("FeedbackApi.Entities.Comment", b =>
+                {
+                    b.HasOne("FeedbackApi.Entities.Suggestion", "Suggestion")
+                        .WithMany("Comments")
+                        .HasForeignKey("SuggestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Suggestion");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("FeedbackApi.Entities.UserRole", null)
@@ -367,6 +377,11 @@ namespace FeedbackApi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FeedbackApi.Entities.Suggestion", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

@@ -53,6 +53,8 @@ namespace FeedbackApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SuggestionId");
+
                     b.ToTable("Comments");
                 });
 
@@ -197,14 +199,14 @@ namespace FeedbackApi.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "aa02dd9b-cf7d-416d-9534-ed6a8c364b16",
+                            ConcurrencyStamp = "63e9f82e-509f-405a-98ed-764304dba85c",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "4804d6ee-d00a-4ddf-a4c9-5d3d10e5aaa0",
+                            ConcurrencyStamp = "42cc4b1b-6249-4c63-8b4a-75027883f3e1",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -313,6 +315,17 @@ namespace FeedbackApi.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("FeedbackApi.Entities.Comment", b =>
+                {
+                    b.HasOne("FeedbackApi.Entities.Suggestion", "Suggestion")
+                        .WithMany("Comments")
+                        .HasForeignKey("SuggestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Suggestion");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("FeedbackApi.Entities.UserRole", null)
@@ -362,6 +375,11 @@ namespace FeedbackApi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FeedbackApi.Entities.Suggestion", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }
