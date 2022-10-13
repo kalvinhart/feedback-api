@@ -23,7 +23,7 @@ namespace FeedbackApi.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
             };
 
             var roles = await _userManager.GetRolesAsync(user);

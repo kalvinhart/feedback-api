@@ -3,6 +3,7 @@ using FeedbackApi.Data;
 using FeedbackApi.DTOs.Suggestion;
 using FeedbackApi.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,11 +16,13 @@ namespace FeedbackApi.Controllers
     {
         private readonly FeedbackContext _context;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
 
-        public SuggestionsController(FeedbackContext context, IMapper mapper)
+        public SuggestionsController(FeedbackContext context, IMapper mapper, UserManager<User> userManager)
         {
             _context = context;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -53,21 +56,27 @@ namespace FeedbackApi.Controllers
 
             var newSuggestion = _mapper.Map<Suggestion>(suggestionDto);
 
-            var createdSuggestion = await _context.Suggestions.AddAsync(newSuggestion);
+            await _context.Suggestions.AddAsync(newSuggestion);
             await _context.SaveChangesAsync();
+
             return CreatedAtRoute("GetSuggestions", newSuggestion);
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Edit(EditSuggestionDto suggestionDto)
         {
             if (suggestionDto == null) return BadRequest("No data was received");
 
+            var user = await _userManager.FindByNameAsync(User.Identity!.Name);
+
             var suggestion = await _context.Suggestions.FirstOrDefaultAsync(s => s.Id == suggestionDto.Id);
             if (suggestion == null) return NotFound("Suggestion ID does not exist.");
+
+            if (user.Id != suggestion.UserId) return Forbid();
 
             var newSuggestion = _mapper.Map(suggestionDto, suggestion);
 
